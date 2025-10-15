@@ -1,0 +1,40 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Environment variable files
+.env
+.env.*
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Editor folders
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Database files (se locais, em dev)
+*.sqlite3
+
+# Python egg info
+*.egg-info/
+dist/
+build/
+
+# Heroku / Render build files
+*.pid
+
+# Misc
+*.bak
+*.swp

@@ -1,10 +1,13 @@
 import os
 import time
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Path
 from pydantic import BaseModel
 from typing import List
 from sqlalchemy import create_engine, Column, String, Integer, Text, ForeignKey
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+
+load_dotenv()
 
 # --- Configuração do banco ---
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -54,7 +57,7 @@ class MachineSchema(BaseModel):
     last_seen: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ScriptCreateSchema(BaseModel):
