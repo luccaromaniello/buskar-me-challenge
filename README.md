@@ -32,7 +32,7 @@ Eu utilizei o (Render)[https://render.com/]. Crie um banco de dados PostgreSQL e
 ```bash
 DATABASE_URL=postgresql://usuario:senha@host:porta/nome_do_banco # sua External URL do Render
 ```
-
+---
 
 ## Execução
 
