@@ -41,6 +41,6 @@ Na raiz do projeto, execute o seguinte comando para iniciar o servidor:
 ```bash
 uvicorn server:app --reload
 ```
-O servidor estará disponível em `http://localhost:8000` ou `http://localhost:8000/docs` (Documentação automática - FastAPI). Você pode fazer requisições usando CURL ou algo software como Postman/Insomnia.
+O servidor estará disponível em `http://localhost:8000` ou `http://localhost:8000/docs` (Documentação automática - FastAPI). Você pode fazer requisições usando CURL ou algum software como Postman/Insomnia.
 
 ### Bot do Discord
