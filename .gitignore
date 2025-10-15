@@ -12,6 +12,7 @@ env/
 # Environment variable files
 .env
 .env.*
+!.env.example
 
 # OS metadata
 .DS_Store
