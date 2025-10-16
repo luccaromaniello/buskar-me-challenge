@@ -117,9 +117,8 @@ def get_db():
 # --- Cria as tabelas no banco (execução única no start) ---
 Base.metadata.create_all(bind=engine)
 
+
 # --- Endpoints ---
-
-
 @app.get("/machines", response_model=list[MachineSchema])
 def get_machines():
     """

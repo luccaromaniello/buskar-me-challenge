@@ -98,6 +98,21 @@ API_URL=http://localhost:8000
 
 ## Execução
 
+### Ambiente virtual
+Crie um ambiente virtual usando o Python 3.8 ou superior:
+```bash
+python -m venv venv
+```
+Ative o ambiente virtual:
+```bash
+source venv/bin/activate # Linux/Mac
+venv\Scripts\activate # Windows
+```
+Depois da ativação, seu prompt do terminal deve mudar para mostrar seu ambiente virtual:
+```bash
+(venv) seu-usuario$
+```
+
 ### Servidor
 Na raiz do projeto, execute o seguinte comando para iniciar o servidor:
 ```bash
@@ -110,3 +125,8 @@ Em outra instância do terminal, na raiz do projeto, execute o seguinte comando 
 ```bash
 python discord_bot.py
 ```
+
+## Finalizar execução
+Para finalizar o bot, pressione `Ctrl+C` no terminal onde ele está sendo executado.
+Para finalizar o servidor, pressione `Ctrl+C` no terminal onde ele está sendo executado.
+Você pode sair do ambiente virtual digitando `deactivate` no terminal.
