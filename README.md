@@ -42,10 +42,6 @@ Bot Permissions:
 - Read Message History
 - View Channels
 
-- Vá em “Bot” no menu lateral.
-- Role até “Privileged Gateway Intents”.
-- Ative o checkbox “Message Content Intent”.
-
 Em integration type, selecione Guild Install.
 
 Um URL será gerado no final da página — copie esse link. Exemplo:
@@ -58,6 +54,10 @@ https://discord.com/oauth2/authorize?client_id=123456789012345678&scope=bot&perm
 - Autorize o bot
 
 O bot agora aparecerá offline no servidor (isso é normal até você rodar o script). Siga os passos em "Execução" para rodar o bot.
+
+- Vá em “Bot” no menu lateral.
+- Role até “Privileged Gateway Intents”.
+- Ative o checkbox “Message Content Intent”.
 
 Assim que você rodar o discord_bot.py, ele ficará online e pronto para responder comandos.
 
@@ -89,7 +89,7 @@ AUTHORIZED_IDS=123456789012345678 # Você pode colocar vários IDs separados por
 DISCORD_BOT_TOKEN=seutoken # Disponível na aba Bot dentro da sua aplicação no Discord Developer Portal
 ```
 #### URL da API
-Em desenvolvimento, você pode usar o servidor local. Também pode utilizar a API remota na URL `[https://buskar-96ef670202d0.herokuapp.com](https://buskar-96ef670202d0.herokuapp.com)`.
+Em desenvolvimento, você pode usar o servidor local. Também pode utilizar a API remota na URL [https://buskar-96ef670202d0.herokuapp.com](https://buskar-96ef670202d0.herokuapp.com).
 ```bash
 API_URL=https://buskar-96ef670202d0.herokuapp.com
 ```
@@ -131,12 +131,12 @@ Depois da ativação, seu prompt do terminal deve mudar para mostrar seu ambient
 (venv) seu-usuario$
 ```
 
-### Servidor
+### Servidor (Caso queira executar localmente)
 Na raiz do projeto, execute o seguinte comando para iniciar o servidor:
 ```bash
 uvicorn server:app --reload
 ```
-O servidor estará disponível em `https://buskar-96ef670202d0.herokuapp.com`. Você pode consultar a documentação automática da FastAPI em `https://buskar-96ef670202d0.herokuapp.com/docs`. Caso você não utiliza a variável `SERVER_URL`, o padrão apontará para o servidor local. Você pode fazer requisições usando CURL ou algum software como Postman/Insomnia.
+O servidor estará disponível em `localhost:8000`. Você pode consultar a documentação automática da FastAPI em `localhost:8000/docs`. Caso você não utilize a variável `SERVER_URL` apontando para o servidor no Heroku, o padrão apontará para o servidor local. Você pode fazer requisições usando CURL ou algum software como Postman/Insomnia.
 
 ### Bot do Discord
 Em outra instância do terminal, na raiz do projeto, execute o seguinte comando para iniciar o bot:
