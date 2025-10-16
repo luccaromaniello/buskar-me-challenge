@@ -25,11 +25,11 @@ pip install -r requirements.txt
 ```
 
 ### Crie um banco de dados e sua URL de conexão
-Eu utilizei o (Render)[https://render.com/]. Crie um banco de dados PostgreSQL e copie sua *External URL*.
+Eu utilizei o [Render](https://render.com/). Crie um banco de dados PostgreSQL e copie sua *External URL*.
 
 ### Adicionar o Bot do Discord no servidor
 
-- Vá para o (Discord Developer Portal)[https://discord.com/developers/applications]
+- Vá para o [Discord Developer Portal](https://discord.com/developers/applications)
 - Clique em *New Application* e selecione um nome para o bot.
 - Vá até a aba "OAuth2" > "URL Generator"
 - Preencha os seguintes campos:
