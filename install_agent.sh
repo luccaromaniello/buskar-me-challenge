@@ -27,7 +27,7 @@ After=network.target
 [Service]
 ExecStart=/usr/bin/python3 $AGENT_SCRIPT_PATH
 Restart=always
-Environment=SERVER_URL=http://localhost:8000
+Environment=SERVER_URL=https://buskar-96ef670202d0.herokuapp.com/
 Environment=MACHINE_NAME=maquina1
 Environment=MACHINE_ID=$(uuidgen)
 
