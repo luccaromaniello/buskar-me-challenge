@@ -9,7 +9,7 @@ import subprocess
 SERVER_URL = os.getenv("SERVER_URL", "http://localhost:8000")
 MACHINE_NAME = os.getenv("MACHINE_NAME", "default-machine")
 MACHINE_ID = os.getenv("MACHINE_ID", str(uuid.uuid4()))
-INTERVAL = 30  # 5 minutos
+INTERVAL = 300  # 5 minutos
 
 
 def ping():
