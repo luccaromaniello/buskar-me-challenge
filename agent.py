@@ -9,7 +9,7 @@ import subprocess
 SERVER_URL = os.getenv("SERVER_URL", "http://localhost:8000")
 MACHINE_NAME = os.getenv("MACHINE_NAME", "default-machine")
 MACHINE_ID = os.getenv("MACHINE_ID", str(uuid.uuid4()))
-INTERVAL = 300  # 5 minutos
+INTERVAL = 30  # 5 minutos
 
 
 def ping():
@@ -49,6 +49,7 @@ def execute_script(script_content):
         result = subprocess.run(
             script_content,
             shell=True,
+            executable="/bin/bash",
             check=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -67,6 +68,7 @@ def main():
         for cmd in commands:
             print(f"[EXECUTANDO] Script: {cmd['script_name']}")
             output = execute_script(cmd["script_content"])
+            print(f"[OUTPUT] {output}")
             send_result(cmd["id"], output)
         time.sleep(INTERVAL)
 

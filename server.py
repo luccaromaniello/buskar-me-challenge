@@ -1,9 +1,12 @@
+from __future__ import annotations
 import os
 import time
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Path
+from collections.abc import Sequence
+from fastapi import FastAPI, HTTPException, Path, Depends
 from pydantic import BaseModel, ConfigDict
-from typing import ClassVar
+from typing import ClassVar, Tuple
+from sqlalchemy.engine import Row
 from sqlalchemy import create_engine, Column, String, Integer, Text, ForeignKey
 from sqlalchemy.orm import (
     Mapped,
@@ -42,8 +45,8 @@ class Machine(Base):
 
 class Script(Base):
     __tablename__ = "scripts"  # pyright: ignore[reportUnannotatedClassAttribute]
-    name: ClassVar[Column[str]] = Column(String, primary_key=True, index=True)
-    content: ClassVar[Column[str]] = Column(Text)
+    name: Mapped[str] = mapped_column(String, primary_key=True, index=True)
+    content: Mapped[str] = mapped_column(Text)
 
 
 class Command(Base):
@@ -64,6 +67,9 @@ class Command(Base):
 
 
 # --- Schemas Pydantic ---
+class MachineCreate(BaseModel):
+    id: str
+    name: str
 
 
 class MachineSchema(BaseModel):
@@ -88,6 +94,17 @@ class CommandSchema(BaseModel):
     id: int
     machine_id: str
     script_name: str
+    status: str
+    output: str | None = None
+
+    model_config: ClassVar[ConfigDict] = ConfigDict(from_attributes=True)
+
+
+class CommandWithContentSchema(BaseModel):
+    id: int
+    machine_id: str
+    script_name: str
+    script_content: str
     status: str
     output: str | None = None
 
@@ -131,7 +148,7 @@ def get_machines():
 
 
 @app.post("/register_machine")
-def register_machine(machine: MachineSchema):
+def register_machine(machine: MachineCreate):
     """
     Registra ou atualiza uma máquina (chamado pelo agente).
     """
@@ -185,18 +202,38 @@ def execute_script(cmd: CommandCreateSchema):
     return {"message": f"Comando agendado para máquina {cmd.machine_id}"}
 
 
-@app.get("/commands/{machine_id}", response_model=list[CommandSchema])
-def get_commands(machine_id: str = Path(..., description="ID da máquina")):  # pyright: ignore[reportCallInDefaultInitializer]
-    """
-    Retorna comandos pendentes para o agente executar.
-    """
+def get_machine_id(machine_id: str = Path(..., description="ID da máquina")):
+    return machine_id
+
+
+@app.get("/commands/{machine_id}", response_model=list[CommandWithContentSchema])
+def get_commands(
+    machine_id: str = Depends(get_machine_id),
+) -> list[CommandWithContentSchema]:
     db = next(get_db())
-    commands = (
-        db.query(Command)
+
+    results: Sequence[Row[Tuple[Command, Script]]] = (
+        db.query(Command, Script)
+        .join(Script, Command.script_name == Script.name)
         .filter(Command.machine_id == machine_id, Command.status == "pending")
         .all()
     )
-    return commands
+
+    commands_with_content: list[CommandWithContentSchema] = []
+    for row in results:
+        cmd: Command = row[0]
+        script: Script = row[1]
+        commands_with_content.append(
+            CommandWithContentSchema(
+                id=cmd.id,
+                machine_id=cmd.machine_id,
+                script_name=cmd.script_name,
+                script_content=script.content,
+                status=cmd.status,
+                output=cmd.output,
+            )
+        )
+    return commands_with_content
 
 
 @app.post("/commands/{command_id}/result")
