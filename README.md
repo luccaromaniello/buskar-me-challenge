@@ -94,6 +94,17 @@ Em desenvolvimento, você pode usar o servidor local. Também pode utilizar a AP
 API_URL=https://buskar-96ef670202d0.herokuapp.com
 ```
 
+## Configurações do agente
+No terminal Linux, navegue até a pasta onde está o `install_agent.sh` e execute:
+```bash
+chmod +x install_agent.sh
+./install_agent.sh
+```
+
+Para checar se o agente está rodando:
+```
+sudo systemctl status linux-agent
+```
 ---
 
 ## Execução
