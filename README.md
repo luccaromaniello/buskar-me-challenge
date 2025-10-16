@@ -89,14 +89,21 @@ AUTHORIZED_IDS=123456789012345678 # Você pode colocar vários IDs separados por
 DISCORD_BOT_TOKEN=seutoken # Disponível na aba Bot dentro da sua aplicação no Discord Developer Portal
 ```
 #### URL da API
-Em desenvolvimento, você pode usar o servidor local. Também pode utilizar a API remota na URL `xxxxx`.
+Em desenvolvimento, você pode usar o servidor local. Também pode utilizar a API remota na URL `[https://buskar-96ef670202d0.herokuapp.com](https://buskar-96ef670202d0.herokuapp.com)`.
 ```bash
-API_URL=http://localhost:8000
+API_URL=https://buskar-96ef670202d0.herokuapp.com
 ```
 
 ---
 
 ## Execução
+
+### Intervalo do agente
+Para fins de teste, você talvez queira mudar o tempo de 5 minutos para 30 segundos no `agent.py`:
+```bash
+INTERVAL = 300  # original, 5 minutos
+INTERVAL = 30  # teste, 30 segundos
+```
 
 ### Ambiente virtual
 Crie um ambiente virtual usando o Python 3.8 ou superior:
@@ -118,7 +125,7 @@ Na raiz do projeto, execute o seguinte comando para iniciar o servidor:
 ```bash
 uvicorn server:app --reload
 ```
-O servidor estará disponível em `http://localhost:8000` ou `http://localhost:8000/docs` (Documentação automática - FastAPI). Você pode fazer requisições usando CURL ou algum software como Postman/Insomnia.
+O servidor estará disponível em `https://buskar-96ef670202d0.herokuapp.com`. Você pode consultar a documentação automática da FastAPI em `https://buskar-96ef670202d0.herokuapp.com/docs`. Caso você não utiliza a variável `SERVER_URL`, o padrão apontará para o servidor local. Você pode fazer requisições usando CURL ou algum software como Postman/Insomnia.
 
 ### Bot do Discord
 Em outra instância do terminal, na raiz do projeto, execute o seguinte comando para iniciar o bot:
@@ -128,5 +135,25 @@ python discord_bot.py
 
 ## Finalizar execução
 Para finalizar o bot, pressione `Ctrl+C` no terminal onde ele está sendo executado.
+
 Para finalizar o servidor, pressione `Ctrl+C` no terminal onde ele está sendo executado.
+
 Você pode sair do ambiente virtual digitando `deactivate` no terminal.
+
+## Screenshots
+
+### Listagem de máquinas
+Note que existe a persistência de dados entre execuções.
+![Listar máquinas](screenshots/list-command.png)
+
+### Registro de scripts
+Criação de um script que lista arquivos.
+![Registrar script](screenshots/register-command.png)
+
+### Execução de scripts
+Execução do script que lista arquivos.
+![Executar script](screenshots/execute-command.png)
+
+### Output do script executado
+O script foi executado com sucesso. A parte censurada foi removida para fins de privacidade e não afeta o resultado.
+![Output do script executado](screenshots/agent-command.jpeg)
