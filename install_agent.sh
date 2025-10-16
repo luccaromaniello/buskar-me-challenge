@@ -23,11 +23,11 @@ sudo bash -c "cat > $SERVICE_PATH" << EOF
 [Unit]
 Description=Linux Agent para execução remota via Discord
 After=network.target
-^CINFO:     Stopping reloader process [21103]
+
 [Service]
 ExecStart=/usr/bin/python3 $AGENT_SCRIPT_PATH
 Restart=always
-Environment=SERVER_URL=https://buskar-96ef670202d0.herokuapp.com/
+Environment=SERVER_URL=https://buskar-96ef670202d0.herokuapp.com
 Environment=MACHINE_NAME=maquina1
 Environment=MACHINE_ID=$(uuidgen)
 
