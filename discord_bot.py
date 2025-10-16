@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
-API_URL = os.getenv("API_URL")
+API_URL = os.getenv("SERVER_URL")
 AUTHORIZED_IDS = os.getenv("AUTHORIZED_IDS", "")
 AUTHORIZED_USERS = (
     set(int(id.strip()) for id in AUTHORIZED_IDS.split(",") if id.strip())
@@ -49,7 +49,10 @@ async def list_machines(ctx):
                     msg += f"- {m['id']} ({m['name']})\n"
                 await ctx.send(msg)
             else:
-                await ctx.send("Erro ao consultar máquinas.")
+                error_text = await resp.text()
+                await ctx.send(
+                    f"Erro ao consultar máquinas. Status: {resp.status}\nDetalhes: {error_text}"
+                )
 
 
 @list_machines.error
