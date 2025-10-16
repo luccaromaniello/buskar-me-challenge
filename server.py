@@ -2,12 +2,18 @@ import os
 import time
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Path
-from pydantic import BaseModel
-from typing import List
+from pydantic import BaseModel, ConfigDict
+from typing import ClassVar
 from sqlalchemy import create_engine, Column, String, Integer, Text, ForeignKey
-from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+from sqlalchemy.orm import (
+    Mapped,
+    mapped_column,
+    relationship,
+    sessionmaker,
+    DeclarativeBase,
+)
 
-load_dotenv()
+_ = load_dotenv()
 
 # --- Configuração do banco ---
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -16,36 +22,45 @@ if not DATABASE_URL:
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+
+
+class Base(DeclarativeBase):
+    pass
+
 
 # --- Modelos SQLAlchemy ---
-
-
 class Machine(Base):
-    __tablename__ = "machines"
-    id = Column(String, primary_key=True, index=True)
-    name = Column(String, index=True)
-    last_seen = Column(Integer, index=True)
+    __tablename__ = "machines"  # pyright: ignore[reportUnannotatedClassAttribute]
+    id: ClassVar[Column[str]] = Column(String, primary_key=True, index=True)
+    name: ClassVar[Column[str]] = Column(String, index=True)
+    last_seen: ClassVar[Column[int]] = Column(Integer, index=True)
 
-    commands = relationship("Command", back_populates="machine")
+    commands: Mapped[list["Command"]] = relationship(
+        "Command", back_populates="machine"
+    )
 
 
 class Script(Base):
-    __tablename__ = "scripts"
-    name = Column(String, primary_key=True, index=True)
-    content = Column(Text)
+    __tablename__ = "scripts"  # pyright: ignore[reportUnannotatedClassAttribute]
+    name: ClassVar[Column[str]] = Column(String, primary_key=True, index=True)
+    content: ClassVar[Column[str]] = Column(Text)
 
 
 class Command(Base):
-    __tablename__ = "commands"
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    machine_id = Column(String, ForeignKey("machines.id"))
-    script_name = Column(String, ForeignKey("scripts.name"))
-    status = Column(String, default="pending")  # pending ou completed
-    output = Column(Text, nullable=True)
+    __tablename__ = "commands"  # pyright: ignore[reportUnannotatedClassAttribute]
 
-    machine = relationship("Machine", back_populates="commands")
-    script = relationship("Script")
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, index=True, autoincrement=True
+    )
+    machine_id: Mapped[str] = mapped_column(String, ForeignKey("machines.id"))
+    script_name: Mapped[str] = mapped_column(String, ForeignKey("scripts.name"))
+    status: Mapped[str] = mapped_column(
+        String, default="pending"
+    )  # "pending" ou "completed"
+    output: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    machine: Mapped["Machine"] = relationship("Machine", back_populates="commands")
+    script: Mapped["Script"] = relationship("Script")
 
 
 # --- Schemas Pydantic ---
@@ -56,8 +71,7 @@ class MachineSchema(BaseModel):
     name: str
     last_seen: int
 
-    class Config:
-        from_attributes = True
+    model_config: ClassVar[ConfigDict] = ConfigDict(from_attributes=True)
 
 
 class ScriptCreateSchema(BaseModel):
@@ -77,8 +91,7 @@ class CommandSchema(BaseModel):
     status: str
     output: str | None = None
 
-    class Config:
-        orm_mode = True
+    model_config: ClassVar[ConfigDict] = ConfigDict(from_attributes=True)
 
 
 class CommandResultSchema(BaseModel):
@@ -107,7 +120,7 @@ Base.metadata.create_all(bind=engine)
 # --- Endpoints ---
 
 
-@app.get("/machines", response_model=List[MachineSchema])
+@app.get("/machines", response_model=list[MachineSchema])
 def get_machines():
     """
     Retorna máquinas ativas que pingaram nos últimos 5 minutos.
@@ -197,7 +210,7 @@ def post_command_result(command_id: int, result: CommandResultSchema):
     if not command:
         raise HTTPException(status_code=404, detail="Comando não encontrado")
 
-    command.output = result.output  # pyright: ignore[reportAttributeAccessIssue]
-    command.status = "completed"  # pyright: ignore[reportAttributeAccessIssue]
+    command.output = result.output
+    command.status = "completed"
     db.commit()
     return {"message": "Resultado do comando salvo com sucesso"}
