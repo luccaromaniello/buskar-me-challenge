@@ -95,6 +95,26 @@ API_URL=https://buskar-96ef670202d0.herokuapp.com
 ```
 
 ## Configurações do agente
+
+As seguintes configurações assumem que você está usando o Ubuntu 22.04, já enviados os arquivos necessários para a instalação do agente. Isso incluem:
+`requirements.txt`, `install_agent.sh`, `agent.py`. Algumas dependências não são utilizadas pelo agente. Dessa forma, você pode adicioná-las manualmente ao invés de utilizar o `requirements.txt`.
+
+Também se assume que os certificados SSL estão instalados corretamente. Nos meus testes, utilizei uma VM na Oracle Cloud, mas você pode utilizar diretamente em sua máquina local caso tenha disponível.
+
+No terminal do ambiente Ubuntu 22.04:
+```bash
+sudo apt update && sudo apt install -y python3 python3-pip
+```
+Garanta que o Python 3 está acessível com:
+```bash
+python3 --version
+pip3 --version
+```
+Instale as dependências do seu projeto:
+```bash
+pip3 install -r requirements.txt
+```
+
 No terminal Linux, navegue até a pasta onde está o `install_agent.sh` e execute:
 ```bash
 chmod +x install_agent.sh
@@ -103,7 +123,7 @@ chmod +x install_agent.sh
 
 Para checar se o agente está rodando:
 ```
-sudo systemctl status linux-agent
+sudo systemctl status linux-agent --no-pager
 ```
 ---
 
@@ -155,16 +175,31 @@ Você pode sair do ambiente virtual digitando `deactivate` no terminal.
 
 ### Listagem de máquinas
 Note que existe a persistência de dados entre execuções.
+
 ![Listar máquinas](screenshots/list-command.png)
 
 ### Registro de scripts
 Criação de um script que lista arquivos.
+
 ![Registrar script](screenshots/register-command.png)
 
 ### Execução de scripts
 Execução do script que lista arquivos.
+
 ![Executar script](screenshots/execute-command.png)
 
-### Output do script executado
-O script foi executado com sucesso. A parte censurada foi removida para fins de privacidade e não afeta o resultado.
-![Output do script executado](screenshots/agent-command.jpeg)
+### Output do script executado em servidor local
+O script foi executado com sucesso. Na imagem abaixo, mostro o output no servidor local. A parte censurada foi removida para fins de privacidade e não afeta o resultado.
+
+Exibir o resultado no Discord não é um requisito do desafio, mas pode ser implementado como melhoria futura.
+
+![Output do script executado em servidor local](screenshots/agent-command.jpeg)
+
+### Exemplo de conexão com ambiente remoto (Ubuntu 22.04 em Oracle Cloud)
+
+![Exemplo de conexão com ambiente remoto](screenshots/connection-remote-agent.png)
+
+### Output do script executado em servidor remoto
+Caso você utilize o servidor do Heroku, o resultado da execução do script é salvo nele e pode ser consultado diretamente via banco de dados. Você pode utilizar o DBeaver, por exemplo, para o acesso e consultar o output na tabela.
+
+![Output do script executado em servidor remoto](screenshots/agent-command-external.png)
