@@ -1,33 +1,106 @@
-import discord
 import os
+import sys
+import discord
+from discord.ext import commands
 import aiohttp
 from dotenv import load_dotenv
 
 load_dotenv()
-TOKEN = os.getenv("BOT_TOKEN")
-AUTHORIZED_USERS = os.getenv("AUTHORIZED_USERS", "").split(",")
+
+DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
+API_URL = os.getenv("API_URL")
+AUTHORIZED_IDS = os.getenv("AUTHORIZED_IDS", "")
+AUTHORIZED_USERS = (
+    set(int(id.strip()) for id in AUTHORIZED_IDS.split(",") if id.strip())
+    if AUTHORIZED_IDS
+    else set()
+)
+
+if DISCORD_BOT_TOKEN is None:
+    print("ERRO: A variável de ambiente DISCORD_BOT_TOKEN não está definida.")
+    sys.exit(1)
 
 intents = discord.Intents.default()
-client = discord.Client(intents=intents)
+intents.message_content = True
+bot = commands.Bot(command_prefix="!", intents=intents)
 
-BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 
-@client.event
+async def is_authorized(ctx):
+    return ctx.author.id in AUTHORIZED_USERS
+
+
+@bot.event
 async def on_ready():
-    print(f"Bot conectado como {client.user}")
+    print(f"Bot conectado como {bot.user}")
 
-@client.event
-async def on_message(message):
-    if str(message.author.id) not in AUTHORIZED_USERS or message.author == client.user:
-        await message.channel.send("❌ Você não tem permissão.")
-        return
 
-    if message.content.startswith("!list_machines"):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f"{BASE_URL}/machines") as resp:
+@bot.command(name="list_machines")
+@commands.check(is_authorized)
+async def list_machines(ctx):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"{API_URL}/machines") as resp:
+            if resp.status == 200:
+                machines = await resp.json()
+                if not machines:
+                    await ctx.send("Nenhuma máquina ativa no momento.")
+                    return
+                msg = "**Máquinas ativas:**\n"
+                for m in machines:
+                    msg += f"- {m['id']} ({m['name']})\n"
+                await ctx.send(msg)
+            else:
+                await ctx.send("Erro ao consultar máquinas.")
+
+
+@list_machines.error
+async def list_machines_error(ctx, error):
+    if isinstance(error, commands.CheckFailure):
+        await ctx.send("Você não tem permissão para usar este comando.")
+
+
+@bot.command(name="register_script")
+@commands.check(is_authorized)
+async def register_script(ctx, name: str, *, content: str):
+    payload = {"name": name, "content": content}
+    async with aiohttp.ClientSession() as session:
+        async with session.post(f"{API_URL}/scripts", json=payload) as resp:
+            if resp.status == 200:
                 data = await resp.json()
-                msg = "\n".join([f"{m['name']} (ID: {m['id']})" for m in data])
-                await message.channel.send(msg or "Nenhuma máquina ativa.")
+                await ctx.send(data.get("message", "Script cadastrado com sucesso."))
+            else:
+                error = await resp.json()
+                await ctx.send(f"Erro: {error.get('detail', 'Desconhecido')}")
 
-# Implemente os outros comandos depois
-client.run(TOKEN)
+
+@register_script.error
+async def register_script_error(ctx, error):
+    if isinstance(error, commands.CheckFailure):
+        await ctx.send("Você não tem permissão para usar este comando.")
+    else:
+        await ctx.send("Uso correto: !register_script <nome> <conteúdo do script>")
+
+
+@bot.command(name="execute_script")
+@commands.check(is_authorized)
+async def execute_script(ctx, machine_id: str, script_name: str):
+    payload = {"machine_id": machine_id, "script_name": script_name}
+    async with aiohttp.ClientSession() as session:
+        async with session.post(f"{API_URL}/execute", json=payload) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+                await ctx.send(data.get("message", "Comando agendado com sucesso."))
+            else:
+                error = await resp.json()
+                await ctx.send(f"Erro: {error.get('detail', 'Desconhecido')}")
+
+
+@execute_script.error
+async def execute_script_error(ctx, error):
+    if isinstance(error, commands.CheckFailure):
+        await ctx.send("Você não tem permissão para usar este comando.")
+    else:
+        await ctx.send("Uso correto: !execute_script <nome_máquina> <nome_script>")
+
+
+if __name__ == "__main__":
+    bot.run(DISCORD_BOT_TOKEN)
