@@ -6,3 +6,4 @@ pydantic
 python-dotenv
 discord.py
 aiohttp
+requests
